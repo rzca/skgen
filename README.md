@@ -1,9 +1,11 @@
-# Overview
-This is a source generator which finds Semantic Kernel plugins and generates helper static extension methods for calling them with all the right inputs.
+# What this package does
+This is a source generator which finds [Semantic Kernel](https://github.com/microsoft/semantic-kernel) plugins and generates helper static extension methods for calling them with all the right inputs.
 
+### Semantic Kernel plugins
 Semantic Kernel plugins are stringly-typed, and it's easy to forget a variable or two when calling them:
 
 A typical Semantic Kernel project defines its prompt-based plugins in a folder called Plugins:
+```
 .
 ├── Plugins/
 │   ├── Summarize/
@@ -15,55 +17,46 @@ A typical Semantic Kernel project defines its prompt-based plugins in a folder c
 │           ├── config.json
 │           └── skprompt.txt
 └── Program.cs
+```
 
+A typical config.json file looks like this:
 ```json
 {
   "schema": 1,
-  "description": "Summarize given text or any text document",
-  "execution_settings": {
-    "default": {
-      "max_tokens": 512,
-      "temperature": 0.0,
-      "top_p": 0.0,
-      "presence_penalty": 0.0,
-      "frequency_penalty": 0.0
-    }
+  "type": "completion",
+  "description": "Gives helpful responses using snippets of relevant information",
+  "completion": {
+    "max_tokens": 500,
+    "temperature": 0.5,
+    "top_p": 0.0,
+    "presence_penalty": 0.0,
+    "frequency_penalty": 0.0
   },
-  "input_variables": [
-    {
-      "name": "input",
-      "description": "Text to summarize",
-      "default": "",
-      "is_required": true
-    }
-  ]
+  "input": {
+    "parameters": [
+      {
+        "name": "prompt",
+        "description": "The user's prompt",
+        "defaultValue": ""
+      },
+      {
+        "name": "snippet0",
+        "description": "The most relevant snippet found from documents",
+        "defaultValue": ""
+      },
+      {
+        "name": "snippet1",
+        "description": "The second most relevant snippet found from documents",
+        "defaultValue": ""
+      },
+      {
+        "name": "snippet2",
+        "description": "The third most relevant snippet found from documents",
+        "defaultValue": ""
+      }
+    ]
+  }
 }
-```
-
-```txt
-[SUMMARIZATION RULES]
-DONT WASTE WORDS
-USE SHORT, CLEAR, COMPLETE SENTENCES.
-DO NOT USE BULLET POINTS OR DASHES.
-USE ACTIVE VOICE.
-MAXIMIZE DETAIL, MEANING
-FOCUS ON THE CONTENT
-
-[BANNED PHRASES]
-This article
-This document
-This page
-This material
-[END LIST]
-
-Summarize:
-Hello how are you?
-+++++
-Hello
-
-Summarize this
-{{$input}}
-+++++
 ```
 
 This source generator goes through and finds every file called `config.json` and generates static extension methods for Microsoft.SemanticKernel.Kernel that look like this:
@@ -77,7 +70,7 @@ namespace Skgen;
 public static partial class KernelExtensionMethods
 {
     
-    public static async Task<FunctionResult> PersistentAssistantGetResponseAsync(this Kernel kernel, string prompt = "", string snippet0 = "", string snippet1 = "", string snippet2 = "", CancellationToken cancellationToken = default(CancellationToken))
+    public static async Task<FunctionResult> AssistantGetResponseAsync(this Kernel kernel, string prompt = "", string snippet0 = "", string snippet1 = "", string snippet2 = "", CancellationToken cancellationToken = default(CancellationToken))
     {
         var arguments = new KernelArguments();
         arguments["prompt"] = prompt;
@@ -85,29 +78,30 @@ public static partial class KernelExtensionMethods
 		arguments["snippet1"] = snippet1;
 		arguments["snippet2"] = snippet2;
     
-        var answer = await kernel.InvokeAsync("PersistentAssistant", "GetResponse", arguments, cancellationToken);
+        var answer = await kernel.InvokeAsync("Assistant", "GetResponse", arguments, cancellationToken);
         return answer;
     }
 
-    public static async Task<FunctionResult> SummarizePluginSummarizeAsync(this Kernel kernel, string input = "", string chunk = "", string totalChunks = "", string fact1 = "", string fact2 = "", string fact3 = "", CancellationToken cancellationToken = default(CancellationToken))
+    public static async Task<FunctionResult> SummarizeSummarizeWithContextAsync(this Kernel kernel, string input = "", string fact1 = "", string fact2 = "", string fact3 = "", CancellationToken cancellationToken = default(CancellationToken))
     {
         var arguments = new KernelArguments();
         arguments["input"] = input;
-		arguments["chunk"] = chunk;
-		arguments["totalChunks"] = totalChunks;
 		arguments["fact1"] = fact1;
 		arguments["fact2"] = fact2;
 		arguments["fact3"] = fact3;
     
-        var answer = await kernel.InvokeAsync("SummarizePlugin", "Summarize", arguments, cancellationToken);
+        var answer = await kernel.InvokeAsync("Summarize", "SummarizeWithContext", arguments, cancellationToken);
         return answer;
     }
 }
+
 ```
 
 # Getting started
-install the package `dotnet add package Skgen`
+### Install the package 
+`dotnet add package Skgen`
 
+### Adjust your package's csproj
 By default, the source generated code is not persisted to disk. In order to persist it to a file called Generated, you can add this to your csproj:
 
 ```xml
@@ -120,15 +114,15 @@ By default, the source generated code is not persisted to disk. In order to pers
     <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
 </ItemGroup>
 ```
-
 Thank you to Andrew Lock for [describing this solution!](https://andrewlock.net/creating-a-source-generator-part-6-saving-source-generator-output-in-source-control/)
 
+### Reasoning
 The point of <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" /> is to avoid compiling the source generated files after they have been spit out to disk and hence double compiling the same thing and hitting errors like this `Error CS0111: Type 'KernelExtensionMethods' already defines a member called '' with the same parameters.
 
 ![Error CS0111: Type 'KernelExtensionMethods' already defines a member called '' with the same parameters](./readme/image.png)
 
-# Drawbacks
-Despite my best effort, I haven't gotten intellisense to respect these new extension methods without removing <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" /> and hence breaking compilation 😔. If you figure this out, please let me know!
+## Drawbacks
+Despite my best effort, I haven't gotten intellisense in Rider, Visual Studio or Visual Studio code to respect these new extension methods without removing <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" /> and hence breaking compilation when you build the second time😔. If you figure this out, please let me know!
 
 ![Intellisense shows red squiggles on the new methods even though they work](./readme/brokenintellisense.pngimage.png)
 
