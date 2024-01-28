@@ -4,6 +4,10 @@
     "Generators": {
       "commandName": "DebugRoslynComponent",
       "targetProject": "../Skgen.Sample/Skgen.Sample.csproj"
+    },
+    "Sample": {
+      "commandName": "Project",
+      "targetProject": "../Skgen.Sample/Skgen.Sample.csproj"
     }
   }
 }

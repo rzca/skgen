@@ -7,7 +7,7 @@ namespace Skgen;
 public static partial class KernelExtensionMethods
 {
     
-    public static async Task<FunctionResult> PersistentAssistantGetResponseAsync(this Kernel kernel, string prompt = "", string snippet0 = "", string snippet1 = "", string snippet2 = "", CancellationToken cancellationToken = default(CancellationToken))
+    public static async Task<FunctionResult> AssistantGetResponseAsync(this Kernel kernel, string prompt = "", string snippet0 = "", string snippet1 = "", string snippet2 = "", CancellationToken cancellationToken = default(CancellationToken))
     {
         var arguments = new KernelArguments();
         arguments["prompt"] = prompt;
@@ -15,21 +15,19 @@ public static partial class KernelExtensionMethods
 		arguments["snippet1"] = snippet1;
 		arguments["snippet2"] = snippet2;
     
-        var answer = await kernel.InvokeAsync("PersistentAssistant", "GetResponse", arguments, cancellationToken);
+        var answer = await kernel.InvokeAsync("Assistant", "GetResponse", arguments, cancellationToken);
         return answer;
     }
 
-    public static async Task<FunctionResult> SummarizePluginSummarizeAsync(this Kernel kernel, string input = "", string chunk = "", string totalChunks = "", string fact1 = "", string fact2 = "", string fact3 = "", CancellationToken cancellationToken = default(CancellationToken))
+    public static async Task<FunctionResult> SummarizeSummarizeWithContextAsync(this Kernel kernel, string input = "", string fact1 = "", string fact2 = "", string fact3 = "", CancellationToken cancellationToken = default(CancellationToken))
     {
         var arguments = new KernelArguments();
         arguments["input"] = input;
-		arguments["chunk"] = chunk;
-		arguments["totalChunks"] = totalChunks;
 		arguments["fact1"] = fact1;
 		arguments["fact2"] = fact2;
 		arguments["fact3"] = fact3;
     
-        var answer = await kernel.InvokeAsync("SummarizePlugin", "Summarize", arguments, cancellationToken);
+        var answer = await kernel.InvokeAsync("Summarize", "SummarizeWithContext", arguments, cancellationToken);
         return answer;
     }
 }
