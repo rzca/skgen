@@ -8,7 +8,7 @@
 
     <IsPackable>true</IsPackable>
     <PackageId>Skgen</PackageId>
-    <Version>0.0.9</Version>
+    <Version>0.0.10</Version>
     <PackageReadmeFile>./README.md</PackageReadmeFile>
     <PackageLicenseFile>./LICENSE</PackageLicenseFile>
     <RepositoryUrl>https://github.com/rzca/Skgen.git</RepositoryUrl>

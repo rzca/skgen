@@ -124,6 +124,6 @@ The point of <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" /> is
 ## Drawbacks
 Despite my best effort, I haven't gotten intellisense in Rider, Visual Studio or Visual Studio code to respect these new extension methods without removing <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" /> and hence breaking compilation when you build the second time😔. If you figure this out, please let me know!
 
-![Intellisense shows red squiggles on the new methods even though they work](./readme/brokenintellisense.pngimage.png)
+![Intellisense shows red squiggles on the new methods even though they work](./readme/brokenintellisense.png)
 
 
