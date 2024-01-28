@@ -98,8 +98,9 @@ public static partial class KernelExtensionMethods
 ```
 
 # Getting started
-### Install the package 
-`dotnet add package Skgen`
+1. Install the package with `dotnet add package Skgen`
+2. Add `global using Skgen;` to the top of Program.cs or to GlobalUsings.cs. All generated methods live in the Skgen namespace.
+3. Adjust your package's csproj as below
 
 ### Adjust your package's csproj
 By default, the source generated code is not persisted to disk. In order to persist it to a file called Generated, you can add this to your csproj:
