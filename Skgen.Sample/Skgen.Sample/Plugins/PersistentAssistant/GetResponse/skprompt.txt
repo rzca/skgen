@@ -1,0 +1,11 @@
+The below are relevant snippets.
+
+[START INFO]
+- {{$snippet0}}
+- {{$snippet1}}
+- {{$snippet2}}
+[END INFO]
+
+Using those relevant facts retrieved from informational documents, respond to the following prompt:
+{{$prompt}}
++++++
